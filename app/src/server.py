@@ -14,8 +14,7 @@ from .hasura import Hasura
 from .utils import get_user
 from .radius import send_accounting_packet
 
-#HASURA_ADMIN_TOKEN = os.environ['HASURA_ADMIN_TOKEN']
-HASURA_ADMIN_TOKEN = 'ay49kkjqgd8refzj9km40z6ofsy9pl69'
+HASURA_ADMIN_TOKEN = os.environ['HASURA_ADMIN_TOKEN']
 
 @app.route('/')
 def hello():
