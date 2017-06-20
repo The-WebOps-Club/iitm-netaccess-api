@@ -82,34 +82,34 @@ def authorize_device():
         else:
             body['valid_till'] = (dt.datetime.now() + dt.timedelta(days=validity_option)).isoformat()
 
-    #try:
-    nick = body['nick']
-    resp = hasura.data.select('device', ['id', 'mac_addr', 'nick'], {'nick': nick})
-    if len(resp) == 0:
-        new_device = hasura_admin.data.insert('device', [{
-                'user_id': user['hasura_id'],
-                'mac_addr': body['mac_addr'],
-                'nick': nick
-            }], ['id', 'user_id', 'mac_addr', 'nick'])
-        new_device = new_device['returning'][0]
-    else:
-        new_device = resp[0]
-    ipv4_association = hasura_admin.data.update('ipv4', {
-    'device_id': new_device['id']}, {
-        'ip': origin,
-        'valid_till': body['valid_till']
-    }, returning=['id', 'ip', 'device_id', 'associated_at', 'valid_till'])
-    if len(ipv4_association['returning']) == 0:
-        new_ipv4 = hasura_admin.data.insert('ipv4', [{
-                'ip': origin,
-                'device_id': new_device['id'],
-                'associated_at': body['associated_at'],
-                'valid_till': body['valid_till']
-            }], ['id', 'ip', 'device_id', 'associated_at', 'valid_till'])
-    else:
-        new_ipv4 = ipv4_association['returning']
+    try:
+        nick = body['nick']
+        resp = hasura.data.select('device', ['id', 'mac_addr', 'nick'], {'nick': nick})
+        if len(resp) == 0:
+            new_device = hasura_admin.data.insert('device', [{
+                    'user_id': user['hasura_id'],
+                    'mac_addr': body['mac_addr'],
+                    'nick': nick
+                }], ['id', 'user_id', 'mac_addr', 'nick'])
+            new_device = new_device['returning'][0]
+        else:
+            new_device = resp[0]
+        ipv4_association = hasura_admin.data.update('ipv4', {
+        'device_id': new_device['id']}, {
+            'ip': origin,
+            'valid_till': body['valid_till']
+        }, returning=['id', 'ip', 'device_id', 'associated_at', 'valid_till'])
+        if len(ipv4_association['returning']) == 0:
+            new_ipv4 = hasura_admin.data.insert('ipv4', [{
+                    'ip': origin,
+                    'device_id': new_device['id'],
+                    'associated_at': body['associated_at'],
+                    'valid_till': body['valid_till']
+                }], ['id', 'ip', 'device_id', 'associated_at', 'valid_till'])
+        else:
+            new_ipv4 = ipv4_association['returning']
 
-    #except Exception as e:
-    #    abort(500, e)
+    except Exception as e:
+        abort(500, e)
 
     return jsonify(token=token, user=user, origin=request.headers.get('X-Forwarded-For', request.remote_addr), radius=radius_resp, device=new_device, ipv4=new_ipv4)
