@@ -41,7 +41,7 @@ def _500():
 def get_ip():
     return jsonify(ipv4=request.headers.get('X-Forwarded-For', request.remote_addr))
 
-@app.route('/authorize_device', methods=['POST', 'GET', 'OPTIONS'])
+@app.route('/authorize_device', methods=['POST', 'GET'])
 def authorize_device():
     '''
     POST params: nick, mac_addr, validity_option
