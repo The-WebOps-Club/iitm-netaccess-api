@@ -14,6 +14,7 @@ from .exceptions import LDAPLoginException, HasuraAuthException, RadiusException
 from .hasura import Hasura
 from .utils import get_user
 from .radius import send_accounting_packet
+from .cors import crossdomain
 
 HASURA_ADMIN_TOKEN = os.environ['HASURA_ADMIN_TOKEN']
 
@@ -37,11 +38,13 @@ def _405():
 def _500():
     raise InternalServerError("This is an error")
 
-@app.route('/get_ip', methods=['GET'])
+@app.route('/get_ip', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def get_ip():
     return jsonify(ipv4=request.headers.get('X-Forwarded-For', request.remote_addr))
 
-@app.route('/authorize_device', methods=['POST', 'GET'])
+@app.route('/authorize_device', methods=['POST', 'GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def authorize_device():
     '''
     POST params: nick, mac_addr, validity_option
