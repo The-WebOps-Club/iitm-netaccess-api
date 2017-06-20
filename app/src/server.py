@@ -94,9 +94,10 @@ def authorize_device():
         else:
             new_device = resp[0]
         ipv4_association = hasura_admin.data.update('ipv4', {
-        'device_id': new_device['id']}, {
-            'ip': origin,
-            'valid_till': body['valid_till']
+            'ip': origin }, {
+            'device_id': new_device['id'],
+            'valid_till': body['valid_till'],
+            'associated_at': body['associated_at']
         }, returning=['id', 'ip', 'device_id', 'associated_at', 'valid_till'])
         if len(ipv4_association['returning']) == 0:
             new_ipv4 = hasura_admin.data.insert('ipv4', [{
