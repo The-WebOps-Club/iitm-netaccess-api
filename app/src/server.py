@@ -114,3 +114,35 @@ def authorize_device():
         abort(500, e)
 
     return jsonify(token=token, user=user, origin=request.headers.get('X-Forwarded-For', request.remote_addr), radius=radius_resp, device=new_device, ipv4=new_ipv4)
+
+
+@app.route('/remove_device', methods=['POST', 'GET'])
+def remove_device():
+    token = request.cookies.get('dinoisses', request.headers.get('authorization'))
+    if not token:
+        abort(401, 'no token/cookie')
+    elif token.startswith('Bearer'):
+        token = token.split(' ')[1]
+
+    origin = request.headers.get('X-Forwarded-For', request.remote_addr)
+
+    hasura = Hasura('hasura.dashboard.iitm.ac.in', 'http', token)
+    hasura_admin = Hasura('hasura.dashboard.iitm.ac.in', 'http', HASURA_ADMIN_TOKEN)
+    try:
+        user = hasura.auth.info()
+    except HasuraAuthException as e:
+        abort(401, 'invalid token/cookie')
+
+    try:
+        radius_resp = send_accounting_packet(user['username'], origin, start=False, stop=True)
+    except RadiusException as e:
+        abort(500, e)
+
+    try:
+        ipv4_resp = hasura_admin.data.delete('ipv4', {'ip': origin}, returning=['id','ip','device_id'])
+        device_id = resp.returning[0]['device_id']
+        device_resp = hasura_admin.data.delete('device', {'device_id': device_id}, returning=['id', 'nick', 'mac_addr'])
+    except Exception as e:
+        abort(500, e)
+
+    return jsonify(token=token, user=user, origin=request.headers.get('X-Forwarded-For', request.remote_addr), radius=radius_resp, del_ipv4=ipv4_resp, del_device=device_resp)
