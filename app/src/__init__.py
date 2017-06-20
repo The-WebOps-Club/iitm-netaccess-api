@@ -35,4 +35,8 @@ def make_json_app(import_name, **kwargs):
 
 app = make_json_app(__name__)
 
+from flask_cors import CORS
+CORS(app, supports_credentials=True)
+
+
 from .server import *
