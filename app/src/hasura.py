@@ -101,7 +101,7 @@ class _Data:
         if res.status_code == 200:
             return res
         else:
-            raise HasuraDataException(str(res.status_code) + ' : ' + res.json()['message'])
+            raise HasuraDataException(str(res.status_code) + ' : ' + res.json()['path'] + ' , ' + res.json()['error'])
 
     def insert(self, table, objects, returning=[]):
         ''' Insert data method '''
