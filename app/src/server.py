@@ -140,9 +140,7 @@ def remove_device():
 
     try:
         ipv4_resp = hasura_admin.data.delete('ipv4', {'ip': origin}, returning=['id','ip','device_id'])
-        device_id = resp.returning[0]['device_id']
-        device_resp = hasura_admin.data.delete('device', {'device_id': device_id}, returning=['id', 'nick', 'mac_addr'])
     except Exception as e:
         abort(500, e)
 
-    return jsonify(token=token, user=user, origin=request.headers.get('X-Forwarded-For', request.remote_addr), radius=radius_resp, del_ipv4=ipv4_resp, del_device=device_resp)
+    return jsonify(token=token, user=user, origin=request.headers.get('X-Forwarded-For', request.remote_addr), radius=radius_resp, del_ipv4=ipv4_resp)
