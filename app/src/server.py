@@ -5,6 +5,7 @@
 # Date: 18.06.2017
 # Last Modified: 18.06.2017
 
+import os
 import datetime as dt
 from src import app
 from flask import jsonify, abort, request, redirect
@@ -68,7 +69,7 @@ def authorize_device():
     body = {}
     if request.method == 'GET':
         body['nick'] = 'machine-' + origin
-        body['mac_addr'] = ''
+        body['mac_addr'] = 'mac-' + origin
         body['associated_at'] = dt.datetime.now().isoformat()
         body['valid_till'] = (dt.datetime.now() + dt.timedelta(hours=1)).isoformat()
 
